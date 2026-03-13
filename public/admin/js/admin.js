@@ -60,8 +60,17 @@ async function fetchGoogleSheetData() {
         const data = await response.json();
         console.log('Data fetched successfully:', data.length, 'students');
         
+        // Normalize phone field names (handle different column names from Google Forms)
+        const normalizedData = data.map(student => {
+            return {
+                ...student,
+                phone: student.phone || student['Phone Number'] || student['Mobile Number'] || 
+                       student['Contact Number'] || student.mobile || student.contact || 'N/A'
+            };
+        });
+        
         // Return actual data if available, otherwise fallback to sample data
-        return data && data.length > 0 ? data : sampleStudents;
+        return normalizedData && normalizedData.length > 0 ? normalizedData : sampleStudents;
     } catch (error) {
         console.error('Error fetching data:', error);
         console.log('Using sample data as fallback');
