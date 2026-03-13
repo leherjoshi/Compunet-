@@ -60,12 +60,33 @@ async function fetchGoogleSheetData() {
         const data = await response.json();
         console.log('Data fetched successfully:', data.length, 'students');
         
+        // Log first student to see column names
+        if (data.length > 0) {
+            console.log('Sample student data:', data[0]);
+            console.log('Available fields:', Object.keys(data[0]));
+        }
+        
         // Normalize phone field names (handle different column names from Google Forms)
         const normalizedData = data.map(student => {
+            // Try all possible phone field variations
+            const phoneValue = student.phone || 
+                              student['Phone Number'] || 
+                              student['Mobile Number'] || 
+                              student['Contact Number'] ||
+                              student['Phone number'] ||
+                              student['Mobile number'] ||
+                              student['Contact number'] ||
+                              student.mobile || 
+                              student.contact ||
+                              student['फ़ोन नंबर'] || // Hindi
+                              student['मोबाइल नंबर'] || // Hindi
+                              'N/A';
+            
+            console.log('Phone value for', student.name, ':', phoneValue);
+            
             return {
                 ...student,
-                phone: student.phone || student['Phone Number'] || student['Mobile Number'] || 
-                       student['Contact Number'] || student.mobile || student.contact || 'N/A'
+                phone: phoneValue
             };
         });
         
